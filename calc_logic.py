@@ -24,3 +24,6 @@ def divide(a: float, b: float) -> float:
         raise ValueError("На ноль делить нельзя!")
     return a / b
 
+def power(a: float, b: float) -> float:
+    """Возводит первое число в степень второго."""
+    return a ** b
