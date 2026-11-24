@@ -1,31 +1,41 @@
-# Автор: Ульянова Е.А., группа ПРз-23, 23.11.2026
-print("=== Калькулятор в Python ===")
+"""
+Главный модуль приложения Калькулятор.
+Отвечает за взаимодействие с пользователем.
+"""
+import calc_logic #Импортируем наш новый модуль
+
+def get_number(prompt: str) -> float:
+    """Запрашивает у пользователя число с обработкой ошибок."""
+    while True:
+        try:
+            return float(input(prompt))
+        except ValueError:
+            print("Ошибка: введите корректное число!")
 
 def main():
-    try:
-        num1 = float(input("Введите первое число: "))
-        num2 = float(input("Введите второе число: "))
-        operation = input("Введите операцию (+, -, *, /):")
+    print("=== Модульный Калькулятор v2.0 ===")
 
+    num1 = get_number("Введите первое число: ")
+    num2 = get_number("Введите второе число: ")
+    operation = input("Выберите операцию (+, -, *, /): ")
+
+    try:
         if operation == '+':
-            result = num1 + num2
+            result = calc_logic.add(num1, num2)
         elif operation == '-':
-            result = num1 - num2
+            result = calc_logic.subtract(num1, num2)
         elif operation == '*':
-            result = num1 * num2
+            result = calc_logic.multiply(num1, num2)
         elif operation == '/':
-            if num2 == 0:
-                print ("Ошибка: деление на ноль невозможно!")
-                return
-            result = num1/num2
+            result = calc_logic.divide(num1, num2)
         else:
-            print("Ошибка: неизвестная операция.")
+            print("Неизвестная операция!")
             return
 
         print(f"Результат: {result}")
 
-    except ValueError:
-        print("Ошибка: вы ввели буквы вместо чисел!")
+    except ValueError as e:
+        print(f"Ошибка вычисления: {e}")
 
-if __name__== "__main__":
+if __name__ == "__main__":
     main()
