@@ -1,3 +1,6 @@
+import calc_logic
+import db_manager
+
 """
 Главный модуль приложения Калькулятор.
 Отвечает за взаимодействие с пользователем.
@@ -13,8 +16,31 @@ def get_number(prompt: str) -> float:
             print("Ошибка: введите корректное число!")
 
 def main():
-    print("=== Модульный Калькулятор v2.0 ===")
+    print("=== Модульный Калькулятор v3.0 (с историей) ===")
 
+    db_manager.init_db()
+
+    while True:
+        print("\n--- Меню ---")
+        print("1. Выполнить вычисление")
+        print("2. Показать историю (последние 10)")
+        print("3. Очистить историю")
+        print("0. Выход")
+
+        choice = input("Выберите действие: ")
+
+        if choice == '0':
+            print("До свидания!")
+            break
+        elif choice == '1':
+            perform_calculation()
+        elif choice == '2':
+            show_history()
+        elif choice == '3':
+            db_manager.clear_history()
+            print("История очищена.")
+        else:
+            print("Неверный выбор. Попробуйте снова.")
     num1 = get_number("Введите первое число: ")
     num2 = get_number("Введите второе число: ")
     operation = input("Выберите операцию (+, -, *, /): ")
@@ -32,10 +58,54 @@ def main():
             print("Неизвестная операция!")
             return
 
+        #Формируем строку выражения
+        expression = f"{num1} {operation} {num2}"
+
+        #Сохраняем в базу данных
+        db_manager.save_record(expression, result)
+
         print(f"Результат: {result}")
 
     except ValueError as e:
         print(f"Ошибка вычисления: {e}")
+
+def perform_calculation():
+    """Выполняет вычисление и сохраняет результат в БД."""
+    num1 = get_number("Введите первое число: ")
+    num2 = get_number("Введите второе число: ")
+    operation = input("Выберите операцию (+, -, *, /): ")
+
+    try:
+        if operation == '+':
+            result = calc_logic.add(num1, num2)
+        elif operation == '-':
+            result = calc_logic.subtract(num1, num2)
+        elif operation == '*':
+            result = calc_logic.multiply(num1, num2)
+        elif operation == '/':
+            result = calc_logic.divide(num1, num2)
+        else:
+            print("Неизвестная операция!")
+            return
+
+        expression = f"{num1} {operation} {num2}"
+        db_manager.save_record(expression, result)
+        print(f"Результат: {result}")
+
+    except ValueError as e:
+        print(f"Ошибка вычисления: {e}")
+
+def show_history():
+    """Показывает последние 10 записей из истории."""
+    history = db_manager.get_history(10)
+
+    if not history:
+        print("История пуста.")
+        return
+
+    print("\n--- История вычислений ---")
+    for record in history:
+        print(f"  [{record[3]}] {record[1]} = {record[2]}")
 
 if __name__ == "__main__":
     main()
