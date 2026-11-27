@@ -101,3 +101,34 @@ def clear_history():
 
     conn.commit()
     conn.close()
+
+def get_statistics():
+    """
+    Возвращает статистику:
+    общее количество вычислений,
+    среднее значение результата,
+    самое большое и самое маленькое значение.
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(" SELECT COUNT(*), AVG(result), MAX(result), MIN(result) FROM history")
+    stat = cursor.fetchone()
+
+    conn.close()
+    return stat
+
+
+def search_history(keyword):
+    """
+    Ищет записи в истории, где выражение содержит ключевое слово.
+    Возвращает список найденных записей.
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM history WHERE expression LIKE ? ORDER BY id DESC", ('%' + keyword + '%',))
+    records = cursor.fetchall()
+
+    conn.close()
+    return records
